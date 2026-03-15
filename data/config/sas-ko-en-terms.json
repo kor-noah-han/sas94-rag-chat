@@ -12,16 +12,24 @@
     "expand": ["libref", "library reference"]
   },
   {
+    "match": ["엔진", "sas 엔진", "engine"],
+    "expand": ["engine", "SAS engine", "LIBNAME engine"]
+  },
+  {
+    "match": ["오토엑섹", "autoexec"],
+    "expand": ["AUTOEXEC file", "autoexec", "startup configuration"]
+  },
+  {
     "match": ["매크로 변수", "매크로변수"],
     "expand": ["macro variable", "%LET", "%LET statement", "automatic macro variable", "user-generated macro variable"]
   },
   {
-    "match": ["매크로 변수 정의", "매크로 변수 선언"],
+    "match": ["매크로 변수 정의", "매크로 변수 선언", "매크로 변수는 어떻게 정의", "매크로 변수를 정의", "매크로 변수 정의 방법"],
     "expand": ["macro variable", "user-generated macro variable", "%LET statement", "define macro variable"]
   },
   {
     "match": ["자동 매크로 변수"],
-    "expand": ["automatic macro variable", "SYSLIBRC", "SYSJOBID"]
+    "expand": ["automatic macro variable", "SYSLIBRC", "SYSJOBID", "SYSVIYARELEASE"]
   },
   {
     "match": ["매크로 정의", "매크로 만들기", "매크로 생성"],
@@ -32,44 +40,44 @@
     "expand": ["macro", "%MACRO", "%MEND"]
   },
   {
-    "match": ["프로시저 평균", "평균 프로시저", "평균 구하기"],
-    "expand": ["PROC MEANS", "MEANS Procedure", "descriptive statistics"]
+    "match": ["평균 프로시저", "평균 구하기", "평균 계산"],
+    "expand": ["PROC MEANS", "MEANS Procedure", "descriptive statistics", "mean"]
   },
   {
-    "match": ["평균"],
-    "expand": ["mean", "PROC MEANS", "MEANS Procedure"]
+    "match": ["요약 통계", "요약통계", "summary"],
+    "expand": ["PROC SUMMARY", "SUMMARY Procedure", "summary statistics"]
   },
   {
-    "match": ["회귀", "회귀분석"],
-    "expand": ["PROC REG", "REG Procedure", "regression"]
-  },
-  {
-    "match": ["상관", "상관 분석", "상관분석", "상관계수"],
-    "expand": ["PROC CORR", "CORR Procedure", "correlation", "Pearson correlation", "Spearman correlation"]
-  },
-  {
-    "match": ["분산 분석", "분산분석", "anova"],
-    "expand": ["ANOVA", "PROC ANOVA", "PROC GLM", "analysis of variance"]
-  },
-  {
-    "match": ["빈도 분석", "빈도분석", "교차표", "교차 분석"],
-    "expand": ["PROC FREQ", "FREQ Procedure", "frequency tables", "crosstabulation"]
-  },
-  {
-    "match": ["기술 통계", "기술통계", "요약 통계", "기초 통계"],
-    "expand": ["descriptive statistics", "PROC MEANS", "PROC SUMMARY", "SUMMARY Procedure"]
+    "match": ["중앙값", "사분위수", "백분위수"],
+    "expand": ["median", "quartiles", "percentiles", "PROC UNIVARIATE", "PROC MEANS"]
   },
   {
     "match": ["표준편차", "분산"],
     "expand": ["standard deviation", "variance", "PROC MEANS", "PROC SUMMARY"]
   },
   {
-    "match": ["중앙값", "사분위수", "백분위수"],
-    "expand": ["median", "quartiles", "percentiles", "PROC MEANS", "PROC UNIVARIATE"]
+    "match": ["빈도 분석", "빈도분석", "교차표", "교차 분석"],
+    "expand": ["PROC FREQ", "FREQ Procedure", "frequency tables", "crosstabulation"]
   },
   {
-    "match": ["정규성 검정", "정규성", "분포 분석", "분포 확인"],
-    "expand": ["PROC UNIVARIATE", "UNIVARIATE Procedure", "normality test", "distribution analysis"]
+    "match": ["상관", "상관 분석", "상관분석", "상관계수"],
+    "expand": ["PROC CORR", "CORR Procedure", "correlation", "Pearson correlation", "Spearman correlation"]
+  },
+  {
+    "match": ["회귀", "회귀분석", "모델링", "모형 적합"],
+    "expand": ["PROC REG", "PROC GLM", "REG Procedure", "GLM Procedure", "regression", "statistical modeling"]
+  },
+  {
+    "match": ["분산 분석", "분산분석", "anova"],
+    "expand": ["ANOVA", "PROC ANOVA", "PROC GLM", "analysis of variance"]
+  },
+  {
+    "match": ["로지스틱 회귀", "로지스틱", "logistic regression"],
+    "expand": ["PROC LOGISTIC", "LOGISTIC Procedure", "logistic regression"]
+  },
+  {
+    "match": ["혼합 모형", "혼합모형", "mixed model"],
+    "expand": ["PROC MIXED", "MIXED Procedure", "mixed modeling"]
   },
   {
     "match": ["t 검정", "t검정"],
@@ -78,6 +86,14 @@
   {
     "match": ["카이제곱", "카이 제곱", "chi-square"],
     "expand": ["chi-square", "PROC FREQ", "CHISQ option"]
+  },
+  {
+    "match": ["정규성 검정", "정규성", "분포 분석", "분포 확인"],
+    "expand": ["PROC UNIVARIATE", "UNIVARIATE Procedure", "normality test", "distribution analysis"]
+  },
+  {
+    "match": ["유니버리엇", "univariate"],
+    "expand": ["PROC UNIVARIATE", "UNIVARIATE Procedure"]
   },
   {
     "match": ["시각화", "그래프", "그래픽", "차트", "플롯", "plot", "chart"],
@@ -96,12 +112,136 @@
     "expand": ["box plot", "boxplot", "PROC BOXPLOT"]
   },
   {
-    "match": ["시계열", "시계열 분석"],
-    "expand": ["time series", "PROC ARIMA", "ARIMA Procedure"]
+    "match": ["선 그래프", "선그래프", "line chart"],
+    "expand": ["line plot", "series plot", "SGPLOT"]
   },
   {
-    "match": ["iml"],
-    "expand": ["PROC IML", "IML"]
+    "match": ["막대 그래프", "막대그래프", "bar chart"],
+    "expand": ["bar chart", "bar plot", "VBAR", "HBAR", "SGPLOT"]
+  },
+  {
+    "match": ["데이터 스텝", "데이터스텝", "data step"],
+    "expand": ["DATA step", "The DATA Step", "data step processing"]
+  },
+  {
+    "match": ["set statement", "set 문", "set문"],
+    "expand": ["SET statement", "read SAS data set", "DATA step SET statement"]
+  },
+  {
+    "match": ["merge statement", "merge 문", "merge문", "데이터 병합", "데이터를 병합", "병합하는 방법", "병합하기"],
+    "expand": ["MERGE statement", "combine data", "DATA step MERGE statement"]
+  },
+  {
+    "match": ["by 그룹", "by-group", "by group"],
+    "expand": ["BY-group processing", "BY statement", "BY-group"]
+  },
+  {
+    "match": ["retain", "retain 문", "retain statement"],
+    "expand": ["RETAIN statement", "retain values"]
+  },
+  {
+    "match": ["배열", "array"],
+    "expand": ["ARRAY statement", "array processing"]
+  },
+  {
+    "match": ["do loop", "do 문", "반복문"],
+    "expand": ["DO loops", "iterative DO statement", "loop processing"]
+  },
+  {
+    "match": ["if then", "조건문", "if 문"],
+    "expand": ["IF-THEN/ELSE statement", "conditional processing"]
+  },
+  {
+    "match": ["output 문", "output statement", "출력문"],
+    "expand": ["OUTPUT statement", "write observations"]
+  },
+  {
+    "match": ["where", "필터", "조건 필터링"],
+    "expand": ["WHERE statement", "WHERE= option", "subsetting data"]
+  },
+  {
+    "match": ["결측치", "missing value", "missing"],
+    "expand": ["missing values", "special missing values", "missing data"]
+  },
+  {
+    "match": ["문자 함수", "문자열 함수", "string function"],
+    "expand": ["character functions", "string functions", "SCAN", "SUBSTR", "CATX"]
+  },
+  {
+    "match": ["날짜", "시간", "datetime"],
+    "expand": ["date values", "time values", "datetime values", "date functions", "time functions"]
+  },
+  {
+    "match": ["format", "포맷", "서식"],
+    "expand": ["FORMAT statement", "formats", "PROC FORMAT"]
+  },
+  {
+    "match": ["informat", "인포맷"],
+    "expand": ["INFORMAT statement", "informats", "PROC FORMAT"]
+  },
+  {
+    "match": ["sql", "proc sql"],
+    "expand": ["PROC SQL", "SQL Procedure", "query expression"]
+  },
+  {
+    "match": ["조인", "join", "inner join", "left join"],
+    "expand": ["join", "PROC SQL", "inner join", "left join", "table join"]
+  },
+  {
+    "match": ["정렬", "sort", "proc sort"],
+    "expand": ["PROC SORT", "SORT Procedure", "sorting data"]
+  },
+  {
+    "match": ["출력", "print", "proc print"],
+    "expand": ["PROC PRINT", "PRINT Procedure", "print observations"]
+  },
+  {
+    "match": ["전치", "행열변환", "transpose"],
+    "expand": ["PROC TRANSPOSE", "TRANSPOSE Procedure", "transpose data"]
+  },
+  {
+    "match": ["리포트", "보고서", "report"],
+    "expand": ["PROC REPORT", "REPORT Procedure", "reporting"]
+  },
+  {
+    "match": ["테이블 요약", "tabulate", "표 작성"],
+    "expand": ["PROC TABULATE", "TABULATE Procedure", "tabulation"]
+  },
+  {
+    "match": ["가져오기", "가져오는", "불러오기", "불러오는", "import", "csv 읽기", "excel 읽기"],
+    "expand": ["PROC IMPORT", "IMPORT Procedure", "import data", "external file"]
+  },
+  {
+    "match": ["내보내기", "내보내는", "export", "csv 저장", "excel 저장", "파일 저장"],
+    "expand": ["PROC EXPORT", "EXPORT Procedure", "export data"]
+  },
+  {
+    "match": ["ods", "output delivery system", "출력 시스템"],
+    "expand": ["ODS", "Output Delivery System", "ODS destination", "ODS style"]
+  },
+  {
+    "match": ["sgplot", "proc sgplot"],
+    "expand": ["PROC SGPLOT", "SGPLOT Procedure"]
+  },
+  {
+    "match": ["sgpanel", "proc sgpanel"],
+    "expand": ["PROC SGPANEL", "SGPANEL Procedure"]
+  },
+  {
+    "match": ["sgscatter", "proc sgscatter"],
+    "expand": ["PROC SGSCATTER", "SGSCATTER Procedure"]
+  },
+  {
+    "match": ["append", "데이터 추가", "행 추가"],
+    "expand": ["APPEND", "PROC APPEND", "append observations"]
+  },
+  {
+    "match": ["datasets procedure", "proc datasets", "datasets"],
+    "expand": ["PROC DATASETS", "DATASETS Procedure", "manage data sets"]
+  },
+  {
+    "match": ["변수 유지", "변수 제거", "변수 이름 변경", "keep", "drop", "rename"],
+    "expand": ["KEEP statement", "DROP statement", "RENAME statement", "variable selection"]
   },
   {
     "match": ["데이터셋", "데이터 세트"],
@@ -114,5 +254,13 @@
   {
     "match": ["문법", "구문"],
     "expand": ["syntax", "statement syntax"]
+  },
+  {
+    "match": ["시계열", "시계열 분석"],
+    "expand": ["time series", "PROC ARIMA", "ARIMA Procedure"]
+  },
+  {
+    "match": ["iml"],
+    "expand": ["PROC IML", "IML"]
   }
 ]

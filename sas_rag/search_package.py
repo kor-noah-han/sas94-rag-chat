@@ -3,7 +3,7 @@ from __future__ import annotations
 from importlib import metadata
 
 
-MIN_SEARCH_PACKAGE_VERSION = (0, 1, 3)
+MIN_SEARCH_PACKAGE_VERSION = (0, 1, 4)
 
 
 def _parse_version(version_text: str) -> tuple[int, ...]:
@@ -36,6 +36,6 @@ def import_run_search():
     if installed_version is not None and _parse_version(installed_version) < MIN_SEARCH_PACKAGE_VERSION:
         raise RuntimeError(
             "Installed search package is too old. "
-            "Install `sas-94-search-api>=0.1.3` before running chat features."
+            "Install `sas-94-search-api>=0.1.4` before running chat features."
         )
     return run_search
