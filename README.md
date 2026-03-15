@@ -23,7 +23,7 @@ SAS 9.4 문서를 참고해서 답하는 사람용 chat 앱이다.
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-sas94-search-data --tag search-data-20260316-v0.1.4 --output-dir .
+sas94-search-data --tag search-data-20260316-v0.1.5 --output-dir .
 ```
 
 필수 환경 변수:

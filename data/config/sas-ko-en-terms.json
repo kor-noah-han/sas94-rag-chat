@@ -25,7 +25,7 @@
   },
   {
     "match": ["매크로 변수 정의", "매크로 변수 선언", "매크로 변수는 어떻게 정의", "매크로 변수를 정의", "매크로 변수 정의 방법"],
-    "expand": ["macro variable", "user-generated macro variable", "%LET statement", "define macro variable"]
+    "expand": ["macro variable", "user-generated macro variable", "Macro Variables Defined by Users", "%LET", "%LET statement", "define macro variable"]
   },
   {
     "match": ["자동 매크로 변수"],
@@ -129,7 +129,7 @@
   },
   {
     "match": ["merge statement", "merge 문", "merge문", "데이터 병합", "데이터를 병합", "병합하는 방법", "병합하기"],
-    "expand": ["MERGE statement", "combine data", "DATA step MERGE statement"]
+    "expand": ["MERGE statement", "combine data", "DATA step MERGE statement", "Combining Data", "Summary of Ways to Combine SAS Data Sets"]
   },
   {
     "match": ["by 그룹", "by-group", "by group"],
@@ -156,12 +156,12 @@
     "expand": ["OUTPUT statement", "write observations"]
   },
   {
-    "match": ["where", "필터", "조건 필터링"],
-    "expand": ["WHERE statement", "WHERE= option", "subsetting data"]
+    "match": ["where", "where로", "필터", "필터링", "where 필터링", "where로 필터링", "조건 필터링", "데이터 필터링"],
+    "expand": ["WHERE statement", "WHERE= option", "WHERE Expressions", "WHERE Expression Processing", "Syntax of WHERE Expression", "subsetting data", "Subsetting IF Statement"]
   },
   {
-    "match": ["결측치", "missing value", "missing"],
-    "expand": ["missing values", "special missing values", "missing data"]
+    "match": ["결측치", "결측치 처리", "결측값", "missing value", "missing"],
+    "expand": ["missing values", "Missing Values", "special missing values", "Special Missing Values", "missing data"]
   },
   {
     "match": ["문자 함수", "문자열 함수", "string function"],
@@ -172,20 +172,20 @@
     "expand": ["date values", "time values", "datetime values", "date functions", "time functions"]
   },
   {
-    "match": ["format", "포맷", "서식"],
-    "expand": ["FORMAT statement", "formats", "PROC FORMAT"]
+    "match": ["format", "format 지정", "포맷", "포맷 지정", "서식"],
+    "expand": ["FORMAT statement", "formats", "PROC FORMAT", "Syntax: FORMAT Procedure", "Usage: FORMAT Procedure"]
   },
   {
     "match": ["informat", "인포맷"],
     "expand": ["INFORMAT statement", "informats", "PROC FORMAT"]
   },
   {
-    "match": ["sql", "proc sql"],
-    "expand": ["PROC SQL", "SQL Procedure", "query expression"]
+    "match": ["sql", "proc sql", "proc sql로", "sql procedure"],
+    "expand": ["PROC SQL", "SQL Procedure", "Syntax: SQL Procedure", "Example: Using the SQL Procedure", "query expression"]
   },
   {
-    "match": ["조인", "join", "inner join", "left join"],
-    "expand": ["join", "PROC SQL", "inner join", "left join", "table join"]
+    "match": ["조인", "조인하는 방법", "join", "inner join", "left join"],
+    "expand": ["join", "PROC SQL", "SQL Procedure", "Syntax: SQL Procedure", "inner join", "left join", "table join"]
   },
   {
     "match": ["정렬", "sort", "proc sort"],
