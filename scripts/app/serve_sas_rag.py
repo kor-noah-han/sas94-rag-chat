@@ -20,6 +20,67 @@ from sas_rag.app import (
 from sas_rag.service import run_chat
 
 WEB_UI_PATH = Path(__file__).resolve().parents[2] / "web" / "chat_ui.html"
+VALID_MODES = {"dense", "lexical", "hybrid"}
+TRUTHY_VALUES = {"1", "true", "yes", "on"}
+FALSY_VALUES = {"0", "false", "no", "off"}
+
+
+class RequestValidationError(ValueError):
+    pass
+
+
+def require_object(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        raise RequestValidationError("json body must be an object")
+    return payload
+
+
+def parse_choice(payload: dict[str, object], key: str, default: str, choices: set[str]) -> str:
+    value = payload.get(key, default)
+    if not isinstance(value, str):
+        raise RequestValidationError(f"{key} must be one of: {', '.join(sorted(choices))}")
+    normalized = value.strip().lower()
+    if normalized not in choices:
+        raise RequestValidationError(f"{key} must be one of: {', '.join(sorted(choices))}")
+    return normalized
+
+
+def parse_int(payload: dict[str, object], key: str, default: int, *, minimum: int = 1) -> int:
+    value = payload.get(key, default)
+    if isinstance(value, bool):
+        raise RequestValidationError(f"{key} must be an integer")
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError) as exc:
+        raise RequestValidationError(f"{key} must be an integer") from exc
+    if parsed < minimum:
+        raise RequestValidationError(f"{key} must be >= {minimum}")
+    return parsed
+
+
+def parse_float(payload: dict[str, object], key: str, default: float) -> float:
+    value = payload.get(key, default)
+    if isinstance(value, bool):
+        raise RequestValidationError(f"{key} must be a number")
+    try:
+        return float(value)
+    except (TypeError, ValueError) as exc:
+        raise RequestValidationError(f"{key} must be a number") from exc
+
+
+def parse_bool(payload: dict[str, object], key: str, default: bool) -> bool:
+    value = payload.get(key, default)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in TRUTHY_VALUES:
+            return True
+        if normalized in FALSY_VALUES:
+            return False
+    if isinstance(value, int) and value in {0, 1}:
+        return bool(value)
+    raise RequestValidationError(f"{key} must be a boolean")
 
 
 def load_html(server_args: argparse.Namespace) -> str:
@@ -42,11 +103,11 @@ def parse_args() -> argparse.Namespace:
 
 def config_from_request(server_args: argparse.Namespace, payload: dict[str, object]):
     args = argparse.Namespace(**vars(server_args))
-    args.mode = str(payload.get("mode", server_args.mode))
-    args.top_k = int(payload.get("top_k", server_args.top_k))
-    args.rerank = bool(payload.get("rerank", server_args.rerank))
-    args.no_term_expansion = bool(payload.get("no_term_expansion", server_args.no_term_expansion))
-    args.rerank_limit = int(payload.get("rerank_limit", server_args.rerank_limit))
+    args.mode = parse_choice(payload, "mode", server_args.mode, VALID_MODES)
+    args.top_k = parse_int(payload, "top_k", server_args.top_k)
+    args.rerank = parse_bool(payload, "rerank", server_args.rerank)
+    args.no_term_expansion = parse_bool(payload, "no_term_expansion", server_args.no_term_expansion)
+    args.rerank_limit = parse_int(payload, "rerank_limit", server_args.rerank_limit)
     config = build_retrieval_config(args)
     config.dense_limit = max(args.top_k * 4, server_args.dense_limit)
     config.lexical_limit = max(args.top_k * 4, server_args.lexical_limit)
@@ -92,7 +153,10 @@ def make_handler(server_args: argparse.Namespace):
             length = int(self.headers.get("Content-Length", "0"))
             raw = self.rfile.read(length)
             try:
-                payload = json.loads(raw.decode("utf-8"))
+                payload = require_object(json.loads(raw.decode("utf-8")))
+            except RequestValidationError as exc:
+                self._send_json({"error": str(exc)}, status=400)
+                return
             except Exception:
                 self._send_json({"error": "invalid json"}, status=400)
                 return
@@ -106,15 +170,18 @@ def make_handler(server_args: argparse.Namespace):
                 config = config_from_request(server_args, payload)
                 generation_args = argparse.Namespace(
                     model=payload.get("model", server_args.model),
-                    temperature=float(payload.get("temperature", server_args.temperature)),
-                    insecure=bool(payload.get("insecure", server_args.insecure)),
+                    temperature=parse_float(payload, "temperature", server_args.temperature),
+                    insecure=parse_bool(payload, "insecure", server_args.insecure),
                 )
                 chat_response = run_chat(
                     query,
                     config,
                     build_generation_config(generation_args),
-                    max_context_chars=int(payload.get("max_context_chars", 14000)),
+                    max_context_chars=parse_int(payload, "max_context_chars", 14000),
                 )
+            except RequestValidationError as exc:
+                self._send_json({"error": str(exc)}, status=400)
+                return
             except Exception as exc:
                 self._send_json({"error": str(exc)}, status=500)
                 return

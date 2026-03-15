@@ -35,7 +35,7 @@
   - 검색용 DB
   - Search API
   - Python 패키지
-- `sas9-RAG`
+- `sas94-rag-chat`
   - 사람용 chat
   - Gemini 응답 생성
   - chat CLI / chat API

@@ -32,7 +32,7 @@ sas94-search-data --tag search-data-20260315-sas94only --output-dir .
 - `GEMINI_MODEL`
 - `GEMINI_API_BASE_URL`
 
-Qdrant는 chat 앱에서 `server mode only`로 사용한다. 기본 URL은 `http://localhost:6333` 이다.
+기본 검색 모드는 `lexical`이라서 Qdrant 없이도 바로 실행할 수 있다. dense/hybrid를 쓰려면 Qdrant를 `server mode only`로 사용하며 기본 URL은 `http://localhost:6333` 이다.
 
 ## Run
 
@@ -135,4 +135,3 @@ interactive 명령:
 - 이 repo는 검색 엔진 repo가 아니다.
 - SAS Viya 전용 문서는 현재 포함하지 않는다.
 - 대용량 원본 데이터, Qdrant 로컬 파일, PDF는 Git에 올리지 않는다.
-

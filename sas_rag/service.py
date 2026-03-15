@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 
 from sas94_search_api.retrieval import RetrievalConfig, RetrievalResult
 
@@ -17,6 +18,15 @@ class ChatServiceResponse:
     result: RetrievalResult
 
 
+HANGUL_RE = re.compile(r"[가-힣]")
+
+
+def no_context_answer(query: str) -> str:
+    if HANGUL_RE.search(query):
+        return "질문과 직접 연결되는 SAS 9.4 문서 근거를 찾지 못해 답변을 생성하지 않았습니다."
+    return "I could not find supporting SAS 9.4 documentation for that question, so I did not generate an answer."
+
+
 def run_chat(
     query: str,
     retrieval_config: RetrievalConfig,
@@ -26,7 +36,10 @@ def run_chat(
 ) -> ChatServiceResponse:
     search_response = import_run_search()(query, retrieval_config)
     context, used_payloads = build_context(search_response.result, max_context_chars)
-    answer = call_gemini(query, context, generation_config)
+    if not search_response.result.hits or not context.strip() or not used_payloads:
+        answer = no_context_answer(query)
+    else:
+        answer = call_gemini(query, context, generation_config)
     sources = [
         {
             "docset": item.get("docset"),
