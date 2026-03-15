@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
-import os
 import ssl
+import time
 from dataclasses import dataclass
 from urllib import error, parse, request
 
@@ -10,6 +10,13 @@ try:
     import certifi
 except Exception:
     certifi = None
+
+from sas_rag.logging_utils import get_logger
+from sas_rag.prompts import SYSTEM_PROMPT, build_user_prompt
+from sas_rag.settings import load_gemini_settings
+
+
+LOGGER = get_logger(__name__)
 
 
 @dataclass
@@ -32,34 +39,15 @@ def extract_text_from_response(payload: dict[str, object]) -> str:
 
 
 def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
-    model = config.model or os.environ.get("GEMINI_MODEL")
-    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-    base_url = os.environ.get("GEMINI_API_BASE_URL")
-    if not model:
-        raise RuntimeError("Missing GEMINI_MODEL.")
-    if not base_url:
-        raise RuntimeError("Missing GEMINI_API_BASE_URL.")
-    if not api_key:
-        raise RuntimeError("Missing GEMINI_API_KEY or GOOGLE_API_KEY.")
+    settings = load_gemini_settings(config)
 
-    endpoint = f"{base_url.rstrip('/')}/v1beta/models/{model}:generateContent"
-    request_url = f"{endpoint}?{parse.urlencode({'key': api_key})}"
-    # Keep the prompt strict: retrieval decides what is relevant, generation
-    # only turns the retrieved evidence into a readable answer.
+    endpoint = f"{settings.base_url.rstrip('/')}/v1beta/models/{settings.model}:generateContent"
+    request_url = f"{endpoint}?{parse.urlencode({'key': settings.api_key})}"
     body = {
         "system_instruction": {
             "parts": [
                 {
-                    "text": (
-                        "You are a SAS documentation RAG assistant. "
-                        "Answer only from the supplied context. "
-                        "If the context contains syntax, examples, or procedural steps, answer directly from them. "
-                        "Only say the context is insufficient when the context truly does not support an answer. "
-                        "Use the same language as the user's question when practical. "
-                        "Prefer Korean when the user asks in Korean. "
-                        "Cite supporting evidence inline with short labels such as [lepg p.12-13]. "
-                        "When answering a how-to question, start with the direct method first, then add short details."
-                    )
+                    "text": SYSTEM_PROMPT
                 }
             ]
         },
@@ -69,13 +57,7 @@ def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
                 "role": "user",
                 "parts": [
                     {
-                        "text": (
-                            f"Question:\n{query}\n\n"
-                            f"Context:\n{context}\n\n"
-                            "Write a concise answer grounded in the context. "
-                            "When the context includes SAS syntax, include a short code example if helpful. "
-                            "Do not invent SAS behavior that is not present in the sources."
-                        )
+                        "text": build_user_prompt(query, context)
                     }
                 ],
             }
@@ -95,6 +77,7 @@ def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
     elif certifi is not None:
         ssl_context = ssl.create_default_context(cafile=certifi.where())
 
+    started = time.perf_counter()
     try:
         with request.urlopen(req, timeout=120, context=ssl_context) as response:
             payload = json.loads(response.read().decode("utf-8"))
@@ -107,4 +90,11 @@ def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
     text = extract_text_from_response(payload)
     if not text:
         raise RuntimeError(f"Gemini API returned no text: {json.dumps(payload, ensure_ascii=False)}")
+    LOGGER.info(
+        "gemini_call_complete model=%s temperature=%.2f context_chars=%s latency_ms=%.2f",
+        settings.model,
+        config.temperature,
+        len(context),
+        (time.perf_counter() - started) * 1000,
+    )
     return text

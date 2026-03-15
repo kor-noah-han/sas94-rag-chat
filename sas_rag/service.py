@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import re
+import time
 
 from sas94_search_api.retrieval import RetrievalConfig, RetrievalResult
 
 from sas_rag.app import build_context, retrieval_response_dict
 from sas_rag.generation import GenerationConfig, call_gemini
+from sas_rag.logging_utils import get_logger
 from sas_rag.search_package import import_run_search
 
 
@@ -19,6 +21,7 @@ class ChatServiceResponse:
 
 
 HANGUL_RE = re.compile(r"[가-힣]")
+LOGGER = get_logger(__name__)
 
 
 def no_context_answer(query: str) -> str:
@@ -34,12 +37,15 @@ def run_chat(
     *,
     max_context_chars: int = 14000,
 ) -> ChatServiceResponse:
+    started = time.perf_counter()
     search_response = import_run_search()(query, retrieval_config)
     context, used_payloads = build_context(search_response.result, max_context_chars)
     if not search_response.result.hits or not context.strip() or not used_payloads:
         answer = no_context_answer(query)
+        answer_mode = "no_context"
     else:
         answer = call_gemini(query, context, generation_config)
+        answer_mode = "gemini"
     sources = [
         {
             "docset": item.get("docset"),
@@ -50,6 +56,14 @@ def run_chat(
         }
         for item in used_payloads
     ]
+    LOGGER.info(
+        "chat_request_complete mode=%s retrieval_mode=%s hits=%s sources=%s latency_ms=%.2f",
+        answer_mode,
+        search_response.result.mode,
+        len(search_response.result.hits),
+        len(sources),
+        (time.perf_counter() - started) * 1000,
+    )
     return ChatServiceResponse(
         answer=answer,
         retrieval=retrieval_response_dict(search_response.result),

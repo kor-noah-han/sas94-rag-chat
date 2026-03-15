@@ -6,8 +6,13 @@ import json
 import sys
 from dataclasses import dataclass
 from itertools import cycle
+from pathlib import Path
 from threading import Event, Thread
 from time import sleep
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from scripts import _bootstrap  # noqa: F401
 

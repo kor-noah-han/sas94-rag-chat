@@ -6,6 +6,11 @@ import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+import sys
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from scripts import _bootstrap  # noqa: F401
 
@@ -17,12 +22,14 @@ from sas_rag.app import (
     build_generation_config,
     build_retrieval_config,
 )
+from sas_rag.logging_utils import configure_logging, get_logger
 from sas_rag.service import run_chat
 
 WEB_UI_PATH = Path(__file__).resolve().parents[2] / "web" / "chat_ui.html"
 VALID_MODES = {"dense", "lexical", "hybrid"}
 TRUTHY_VALUES = {"1", "true", "yes", "on"}
 FALSY_VALUES = {"0", "false", "no", "off"}
+LOGGER = get_logger(__name__)
 
 
 class RequestValidationError(ValueError):
@@ -202,9 +209,10 @@ def make_handler(server_args: argparse.Namespace):
 
 def main() -> int:
     load_dotenv()
+    configure_logging()
     args = parse_args()
     server = ThreadingHTTPServer((args.host, args.port), make_handler(args))
-    print(f"SAS RAG server listening on http://{args.host}:{args.port}", flush=True)
+    LOGGER.info("chat_server_started host=%s port=%s default_mode=%s", args.host, args.port, args.mode)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

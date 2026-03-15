@@ -102,8 +102,11 @@ interactive 명령:
 ├── sas_rag/
 │   ├── app.py
 │   ├── generation.py
+│   ├── logging_utils.py
+│   ├── prompts.py
 │   ├── retrieval.py
 │   ├── search_package.py
+│   ├── settings.py
 │   └── service.py
 ├── scripts/
 │   ├── app/
@@ -123,6 +126,10 @@ interactive 명령:
   - search 결과를 chat 응답으로 조립
 - [`sas_rag/generation.py`](/Users/noahhan/dev/sas94-rag-chat/sas_rag/generation.py#L1)
   - Gemini 호출
+- [`sas_rag/prompts.py`](/Users/noahhan/dev/sas94-rag-chat/sas_rag/prompts.py#L1)
+  - generation prompt 구성
+- [`sas_rag/settings.py`](/Users/noahhan/dev/sas94-rag-chat/sas_rag/settings.py#L1)
+  - Gemini 설정 로딩
 - [`scripts/app/chat_sas_rag.py`](/Users/noahhan/dev/sas94-rag-chat/scripts/app/chat_sas_rag.py#L1)
   - CLI
 - [`scripts/app/serve_sas_rag.py`](/Users/noahhan/dev/sas94-rag-chat/scripts/app/serve_sas_rag.py#L1)

@@ -10,6 +10,12 @@
   - 검색 결과를 받아 chat 응답을 구성
 - `generation.py`
   - Gemini 호출
+- `prompts.py`
+  - chat 응답용 프롬프트 구성
+- `settings.py`
+  - Gemini 관련 설정 로딩
+- `logging_utils.py`
+  - chat 앱 공용 로깅 설정
 - `app.py`
   - chat CLI/API에서 공통으로 쓰는 인자, 컨텍스트, 출력 유틸
 
