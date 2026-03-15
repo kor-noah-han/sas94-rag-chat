@@ -12,7 +12,12 @@ except Exception:
     certifi = None
 
 from sas_rag.logging_utils import get_logger
-from sas_rag.prompts import SYSTEM_PROMPT, build_user_prompt
+from sas_rag.prompts import (
+    SEARCH_REWRITE_SYSTEM_PROMPT,
+    SYSTEM_PROMPT,
+    build_search_rewrite_prompt,
+    build_user_prompt,
+)
 from sas_rag.settings import load_gemini_settings
 
 
@@ -38,7 +43,7 @@ def extract_text_from_response(payload: dict[str, object]) -> str:
     return "\n".join(texts).strip()
 
 
-def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
+def _call_gemini_text(system_prompt: str, user_prompt: str, config: GenerationConfig) -> str:
     settings = load_gemini_settings(config)
 
     endpoint = f"{settings.base_url.rstrip('/')}/v1beta/models/{settings.model}:generateContent"
@@ -47,7 +52,7 @@ def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
         "system_instruction": {
             "parts": [
                 {
-                    "text": SYSTEM_PROMPT
+                    "text": system_prompt
                 }
             ]
         },
@@ -57,7 +62,7 @@ def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
                 "role": "user",
                 "parts": [
                     {
-                        "text": build_user_prompt(query, context)
+                        "text": user_prompt
                     }
                 ],
             }
@@ -91,10 +96,35 @@ def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
     if not text:
         raise RuntimeError(f"Gemini API returned no text: {json.dumps(payload, ensure_ascii=False)}")
     LOGGER.info(
-        "gemini_call_complete model=%s temperature=%.2f context_chars=%s latency_ms=%.2f",
+        "gemini_call_complete model=%s temperature=%.2f prompt_chars=%s latency_ms=%.2f",
         settings.model,
         config.temperature,
-        len(context),
+        len(user_prompt),
         (time.perf_counter() - started) * 1000,
     )
     return text
+
+
+def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
+    return _call_gemini_text(SYSTEM_PROMPT, build_user_prompt(query, context), config)
+
+
+def rewrite_query_for_search(
+    query: str,
+    config: GenerationConfig,
+    *,
+    expanded_terms: list[str] | None = None,
+    top_sections: list[str] | None = None,
+    family_hints: list[str] | None = None,
+) -> str:
+    rewritten = _call_gemini_text(
+        SEARCH_REWRITE_SYSTEM_PROMPT,
+        build_search_rewrite_prompt(
+            query,
+            expanded_terms=expanded_terms,
+            top_sections=top_sections,
+            family_hints=family_hints,
+        ),
+        config,
+    )
+    return " ".join(rewritten.replace("\n", " ").split()).strip().strip("\"'")

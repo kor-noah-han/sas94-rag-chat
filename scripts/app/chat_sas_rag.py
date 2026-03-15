@@ -29,7 +29,7 @@ from sas_rag.app import (
     retrieval_debug_dict,
 )
 from sas_rag.generation import call_gemini
-from sas_rag.search_package import import_run_search
+from sas_rag.service import run_search_with_fallback
 
 
 @dataclass
@@ -182,14 +182,23 @@ def handle_interactive_command(args: argparse.Namespace, query: str) -> Interact
 
 
 def answer_query(args: argparse.Namespace, query: str) -> int:
+    generation_config = build_generation_config(args)
     with Spinner("Searching documentation"):
-        result = import_run_search()(query, build_retrieval_config(args)).result
+        search_attempt = run_search_with_fallback(query, build_retrieval_config(args), generation_config)
+        result = search_attempt.result
     if not result.hits:
         print("관련 문서를 찾지 못했습니다.", file=sys.stderr)
         return 1
 
     if args.show_debug or args.retrieval_only:
-        print(json.dumps(retrieval_debug_dict(result), ensure_ascii=False))
+        debug_payload = retrieval_debug_dict(result)
+        debug_payload["rewrite"] = {
+            "attempted": search_attempt.rewrite_attempted,
+            "applied": search_attempt.rewrite_applied,
+            "query": search_attempt.rewritten_query,
+            "error": search_attempt.rewrite_error,
+        }
+        print(json.dumps(debug_payload, ensure_ascii=False))
 
     if args.retrieval_only:
         print_hits(result)
@@ -201,7 +210,7 @@ def answer_query(args: argparse.Namespace, query: str) -> int:
         print("\n---")
 
     with Spinner("Generating answer"):
-        answer = call_gemini(query, context, build_generation_config(args))
+        answer = call_gemini(query, context, generation_config)
     print(f"\nAnswer:\n{answer}")
     if args.show_sources:
         print_sources(used_payloads)

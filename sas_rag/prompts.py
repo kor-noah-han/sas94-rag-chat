@@ -12,6 +12,15 @@ SYSTEM_PROMPT = (
     "When answering a how-to question, start with the direct method first, then add short details."
 )
 
+SEARCH_REWRITE_SYSTEM_PROMPT = (
+    "You rewrite user questions into SAS 9.4 documentation search queries. "
+    "Do not answer the question. "
+    "Return only a concise search query with SAS-specific English terms such as procedure names, "
+    "statement names, graphics terms, or feature names. "
+    "Prefer terms that would appear in SAS documentation headings. "
+    "No markdown, no bullets, no explanation, no surrounding quotes."
+)
+
 
 def build_user_prompt(query: str, context: str) -> str:
     return (
@@ -21,3 +30,32 @@ def build_user_prompt(query: str, context: str) -> str:
         "When the context includes SAS syntax, include a short code example if helpful. "
         "Do not invent SAS behavior that is not present in the sources."
     )
+
+
+def build_search_rewrite_prompt(
+    query: str,
+    *,
+    expanded_terms: list[str] | None = None,
+    top_sections: list[str] | None = None,
+    family_hints: list[str] | None = None,
+) -> str:
+    lines = [
+        f"Original question:\n{query}",
+        (
+            "Task:\nRewrite this as a short SAS 9.4 documentation search query. "
+            "Include likely SAS procedure names, statements, options, or graphics terms when helpful."
+        ),
+    ]
+    if expanded_terms:
+        lines.append("Current expanded terms:\n" + ", ".join(expanded_terms[:12]))
+    if top_sections:
+        lines.append("Current weak search hits:\n" + "\n".join(top_sections[:5]))
+    if family_hints:
+        lines.append("Likely SAS terms to prefer:\n" + ", ".join(family_hints[:12]))
+    lines.append(
+        "Output requirements:\n"
+        "- single line only\n"
+        "- 4 to 14 keywords or short phrases\n"
+        "- focused on search terms, not prose"
+    )
+    return "\n\n".join(lines)

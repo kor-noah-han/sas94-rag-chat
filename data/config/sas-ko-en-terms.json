@@ -80,6 +80,22 @@
     "expand": ["chi-square", "PROC FREQ", "CHISQ option"]
   },
   {
+    "match": ["시각화", "그래프", "그래픽", "차트", "플롯", "plot", "chart"],
+    "expand": ["graphics", "ODS Graphics", "Statistical Graphics", "graph", "plot", "SGPLOT"]
+  },
+  {
+    "match": ["산점도", "scatter plot", "scatter"],
+    "expand": ["scatter plot", "SGSCATTER", "scatter"]
+  },
+  {
+    "match": ["히스토그램", "histogram"],
+    "expand": ["histogram", "distribution plot", "PROC UNIVARIATE"]
+  },
+  {
+    "match": ["박스플롯", "boxplot", "box plot"],
+    "expand": ["box plot", "boxplot", "PROC BOXPLOT"]
+  },
+  {
     "match": ["시계열", "시계열 분석"],
     "expand": ["time series", "PROC ARIMA", "ARIMA Procedure"]
   },
