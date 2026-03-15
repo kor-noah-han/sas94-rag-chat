@@ -1,0 +1,8 @@
+{"query":"SAS에서 라이브러리를 어떻게 할당하나요?","expected_docset":"lepg","expected_section_contains":"SAS Libraries"}
+{"query":"libref는 무엇인가요?","expected_docset":"lepg","expected_section_contains":"SAS Libraries"}
+{"query":"매크로 변수는 어떻게 정의하나요?","expected_docset":"mcrolref","expected_section_contains":"Macro Variables"}
+{"query":"매크로는 어떻게 정의하나요?","expected_docset":"mcrolref","expected_section_contains":"Macros"}
+{"query":"PROC ARIMA는 어떻게 사용하나요?","expected_docset":"etsug","expected_section_contains":"ARIMA Procedure"}
+{"query":"PROC IML은 어떻게 사용하나요?","expected_docset":"imlug","expected_section_contains":"IML"}
+{"query":"PROC MEANS는 어떻게 사용하나요?","expected_docset":"proc","expected_section_contains":"MEANS Procedure"}
+{"query":"PROC REG는 어떻게 사용하나요?","expected_docset":"statug","expected_section_contains":"REG Procedure"}

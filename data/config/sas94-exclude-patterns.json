@@ -1,0 +1,28 @@
+{
+  "description": "Exclude Viya and CAS-specific content from the SAS 9.4 chat corpus.",
+  "substring_rules": [
+    "sas viya",
+    "cloud analytic services",
+    "using the macro facility on the sas viya platform",
+    "sysviyarelease",
+    "sysviyaversion",
+    "cas table",
+    "cas tables",
+    "cas session",
+    "cas sessions",
+    "cas statement",
+    "cas engine libref",
+    "cas engine librefs",
+    " caslib",
+    "gocas=",
+    "proc casutil",
+    "sashdat",
+    "cashost",
+    "casport",
+    "sessref=",
+    "libname mycas cas",
+    "libname mycas",
+    "mycas.",
+    "casauto"
+  ]
+}

@@ -1,0 +1,4 @@
+certifi>=2024.0.0
+pypdf>=6.8.0
+qdrant-client[fastembed]>=1.17.1
+sas-94-search-api @ git+https://github.com/kor-noah-han/sas-94-search-API.git@main

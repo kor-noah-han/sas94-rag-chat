@@ -1,0 +1,102 @@
+[
+  {
+    "match": ["라이브러리 할당", "라이브러리 지정", "라이브러리 연결"],
+    "expand": ["assign library", "LIBNAME statement", "libref", "SAS library"]
+  },
+  {
+    "match": ["라이브러리", "라이브러리를"],
+    "expand": ["library", "SAS library", "libref", "LIBNAME"]
+  },
+  {
+    "match": ["리브레프", "libref"],
+    "expand": ["libref", "library reference"]
+  },
+  {
+    "match": ["매크로 변수", "매크로변수"],
+    "expand": ["macro variable", "%LET", "%LET statement", "automatic macro variable", "user-generated macro variable"]
+  },
+  {
+    "match": ["매크로 변수 정의", "매크로 변수 선언"],
+    "expand": ["macro variable", "user-generated macro variable", "%LET statement", "define macro variable"]
+  },
+  {
+    "match": ["자동 매크로 변수"],
+    "expand": ["automatic macro variable", "SYSLIBRC", "SYSJOBID"]
+  },
+  {
+    "match": ["매크로 정의", "매크로 만들기", "매크로 생성"],
+    "expand": ["macro definition", "%MACRO", "%MEND", "define macro"]
+  },
+  {
+    "match": ["매크로", "macro"],
+    "expand": ["macro", "%MACRO", "%MEND"]
+  },
+  {
+    "match": ["프로시저 평균", "평균 프로시저", "평균 구하기"],
+    "expand": ["PROC MEANS", "MEANS Procedure", "descriptive statistics"]
+  },
+  {
+    "match": ["평균"],
+    "expand": ["mean", "PROC MEANS", "MEANS Procedure"]
+  },
+  {
+    "match": ["회귀", "회귀분석"],
+    "expand": ["PROC REG", "REG Procedure", "regression"]
+  },
+  {
+    "match": ["상관", "상관 분석", "상관분석", "상관계수"],
+    "expand": ["PROC CORR", "CORR Procedure", "correlation", "Pearson correlation", "Spearman correlation"]
+  },
+  {
+    "match": ["분산 분석", "분산분석", "anova"],
+    "expand": ["ANOVA", "PROC ANOVA", "PROC GLM", "analysis of variance"]
+  },
+  {
+    "match": ["빈도 분석", "빈도분석", "교차표", "교차 분석"],
+    "expand": ["PROC FREQ", "FREQ Procedure", "frequency tables", "crosstabulation"]
+  },
+  {
+    "match": ["기술 통계", "기술통계", "요약 통계", "기초 통계"],
+    "expand": ["descriptive statistics", "PROC MEANS", "PROC SUMMARY", "SUMMARY Procedure"]
+  },
+  {
+    "match": ["표준편차", "분산"],
+    "expand": ["standard deviation", "variance", "PROC MEANS", "PROC SUMMARY"]
+  },
+  {
+    "match": ["중앙값", "사분위수", "백분위수"],
+    "expand": ["median", "quartiles", "percentiles", "PROC MEANS", "PROC UNIVARIATE"]
+  },
+  {
+    "match": ["정규성 검정", "정규성", "분포 분석", "분포 확인"],
+    "expand": ["PROC UNIVARIATE", "UNIVARIATE Procedure", "normality test", "distribution analysis"]
+  },
+  {
+    "match": ["t 검정", "t검정"],
+    "expand": ["PROC TTEST", "TTEST Procedure", "t test"]
+  },
+  {
+    "match": ["카이제곱", "카이 제곱", "chi-square"],
+    "expand": ["chi-square", "PROC FREQ", "CHISQ option"]
+  },
+  {
+    "match": ["시계열", "시계열 분석"],
+    "expand": ["time series", "PROC ARIMA", "ARIMA Procedure"]
+  },
+  {
+    "match": ["iml"],
+    "expand": ["PROC IML", "IML"]
+  },
+  {
+    "match": ["데이터셋", "데이터 세트"],
+    "expand": ["data set", "SAS data set"]
+  },
+  {
+    "match": ["옵션"],
+    "expand": ["option", "statement option", "system option"]
+  },
+  {
+    "match": ["문법", "구문"],
+    "expand": ["syntax", "statement syntax"]
+  }
+]

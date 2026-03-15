@@ -1,0 +1,9 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: sas9-rag-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./data/qdrant/server:/qdrant/storage

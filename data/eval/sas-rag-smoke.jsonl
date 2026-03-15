@@ -1,0 +1,8 @@
+{"query":"How do I assign a library in SAS?","expected_docset":"lepg","expected_section_contains":"SAS Libraries"}
+{"query":"What is a libref in SAS?","expected_docset":"lepg","expected_section_contains":"SAS Libraries"}
+{"query":"How do I define macro variables in SAS?","expected_docset":"mcrolref","expected_section_contains":"Macro Variables"}
+{"query":"How do I create a macro definition in SAS?","expected_docset":"mcrolref","expected_section_contains":"Macros"}
+{"query":"How do I run PROC ARIMA?","expected_docset":"etsug","expected_section_contains":"ARIMA Procedure"}
+{"query":"How do I use PROC IML?","expected_docset":"imlug","expected_section_contains":"IML"}
+{"query":"How do I use PROC MEANS?","expected_docset":"proc","expected_section_contains":"MEANS Procedure"}
+{"query":"How do I use PROC REG?","expected_docset":"statug","expected_section_contains":"REG Procedure"}

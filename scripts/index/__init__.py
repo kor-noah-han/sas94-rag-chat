@@ -1,0 +1,2 @@
+"""Index building script entrypoints."""
+

@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>__TITLE__</title>
+  <style>
+    :root {
+      --bg: #f3efe4;
+      --bg-strong: #e8dcc3;
+      --panel: rgba(255, 250, 240, 0.84);
+      --panel-strong: #fffaf0;
+      --ink: #1f2a22;
+      --muted: #647067;
+      --line: rgba(31, 42, 34, 0.12);
+      --accent: #1f6b4f;
+      --accent-soft: #d8f0e4;
+      --accent-strong: #0b4f38;
+      --user: #f5b972;
+      --user-soft: #fff2df;
+      --shadow: 0 18px 60px rgba(53, 42, 24, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.82), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(223, 203, 153, 0.42), transparent 32%),
+        linear-gradient(135deg, #f7f2e8 0%, #eee2c8 50%, #e7dccd 100%);
+      color: var(--ink);
+      font-family: "IBM Plex Sans KR", "Pretendard", "Noto Sans KR", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(31, 42, 34, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 42, 34, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 18px;
+      min-height: 100vh;
+      padding: 18px;
+    }
+
+    .sidebar,
+    .workspace {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .brand {
+      display: grid;
+      gap: 10px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "IBM Plex Serif", "Iowan Old Style", Georgia, serif;
+      font-size: 36px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .lead,
+    .meta-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .panel {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(31, 42, 34, 0.08);
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .control-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    select,
+    input[type="number"],
+    input[type="range"],
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(31, 42, 34, 0.12);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(31, 42, 34, 0.08);
+    }
+
+    .quick-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quick-btn,
+    .ghost-btn,
+    .send-btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      transition: transform 150ms ease, background 150ms ease, color 150ms ease, box-shadow 150ms ease;
+      font: inherit;
+    }
+
+    .quick-btn {
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--ink);
+      border: 1px solid rgba(31, 42, 34, 0.08);
+    }
+
+    .quick-btn:hover,
+    .ghost-btn:hover,
+    .send-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 22px 24px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .status-block {
+      display: grid;
+      gap: 6px;
+    }
+
+    .status-title {
+      margin: 0;
+      font-family: "IBM Plex Serif", "Iowan Old Style", Georgia, serif;
+      font-size: 24px;
+      letter-spacing: -0.03em;
+    }
+
+    .status-row,
+    .timing-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(31, 42, 34, 0.08);
+      color: var(--muted);
+    }
+
+    .chip.live {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .chat-scroll {
+      overflow: auto;
+      padding: 24px;
+      scroll-behavior: smooth;
+    }
+
+    .empty-state {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      max-width: 720px;
+      padding: 8px 4px 32px;
+    }
+
+    .empty-state h2 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      letter-spacing: -0.05em;
+      font-family: "IBM Plex Serif", "Iowan Old Style", Georgia, serif;
+    }
+
+    .empty-state p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .message {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+      animation: fadeUp 180ms ease;
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), #3e8564);
+    }
+
+    .message.user .avatar {
+      background: linear-gradient(135deg, #a55b1b, #db8d3d);
+    }
+
+    .bubble {
+      width: min(860px, 100%);
+      padding: 16px 18px;
+      border-radius: 22px;
+      background: var(--panel-strong);
+      border: 1px solid rgba(31, 42, 34, 0.08);
+      box-shadow: 0 10px 28px rgba(56, 42, 20, 0.08);
+      white-space: pre-wrap;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .bubble p {
+      margin: 0 0 12px;
+    }
+
+    .bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .bubble pre {
+      margin: 14px 0;
+      padding: 14px;
+      overflow: auto;
+      border-radius: 16px;
+      background: #1f2a22;
+      color: #f7f4eb;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .bubble code {
+      font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.95em;
+    }
+
+    .bubble :not(pre) > code {
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: rgba(31, 42, 34, 0.08);
+      color: var(--accent-strong);
+    }
+
+    .bubble strong {
+      color: var(--accent-strong);
+    }
+
+    .message.user .bubble {
+      background: linear-gradient(135deg, var(--user-soft), #fffaf1);
+      border-color: rgba(165, 91, 27, 0.12);
+      margin-left: auto;
+    }
+
+    .message.user .message-header,
+    .message.user .bubble {
+      justify-self: end;
+    }
+
+    .message.pending .bubble {
+      color: var(--muted);
+    }
+
+    .sources {
+      display: grid;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .source-card {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(31, 42, 34, 0.08);
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .source-card a {
+      color: var(--accent-strong);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .source-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .source-meta span {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(31, 42, 34, 0.05);
+    }
+
+    .details {
+      margin-top: 8px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(31, 42, 34, 0.08);
+      background: rgba(31, 42, 34, 0.03);
+    }
+
+    .details summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .details summary::-webkit-details-marker { display: none; }
+
+    .details pre {
+      margin: 0;
+      padding: 0 14px 14px;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #314036;
+    }
+
+    .composer {
+      display: grid;
+      gap: 12px;
+      padding: 18px 20px 20px;
+      border-top: 1px solid var(--line);
+      background: rgba(255, 249, 239, 0.82);
+    }
+
+    .composer-card {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(31, 42, 34, 0.08);
+    }
+
+    .composer textarea {
+      min-height: 108px;
+      resize: vertical;
+      border: 0;
+      padding: 6px 0 0;
+      background: transparent;
+      outline: none;
+      line-height: 1.45;
+      display: block;
+    }
+
+    .composer textarea::placeholder {
+      line-height: 1.45;
+    }
+
+    .composer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .composer-hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .ghost-btn,
+    .send-btn {
+      padding: 12px 16px;
+      border-radius: 16px;
+    }
+
+    .ghost-btn {
+      background: rgba(31, 42, 34, 0.06);
+      color: var(--ink);
+    }
+
+    .send-btn {
+      min-width: 132px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      box-shadow: 0 12px 24px rgba(11, 79, 56, 0.24);
+    }
+
+    .send-btn[disabled] {
+      opacity: 0.6;
+      cursor: wait;
+      transform: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1080px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        order: 2;
+      }
+
+      .workspace {
+        order: 1;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 10px;
+        gap: 10px;
+      }
+
+      .topbar,
+      .chat-scroll,
+      .composer {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      h1 { font-size: 30px; }
+      .empty-state h2 { font-size: 28px; }
+      .bubble { border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="eyebrow">SAS 9.4 RAG Chat</span>
+        <h1>문서를 읽는<br />SAS 도우미</h1>
+        <p class="lead">사람이 직접 쓰는 웹 챗입니다. 검색은 외부 search 패키지를 사용하고, 답변은 Gemini가 생성합니다.</p>
+      </div>
+
+      <section class="panel">
+        <h2 class="panel-title">질문 설정</h2>
+        <div class="control-grid">
+          <label>
+            검색 모드
+            <select id="mode">
+              <option value="hybrid">hybrid</option>
+              <option value="lexical">lexical</option>
+              <option value="dense">dense</option>
+            </select>
+          </label>
+
+          <label>
+            top-k
+            <input id="topk" type="number" min="1" max="10" value="__DEFAULT_TOPK__" />
+          </label>
+
+          <label>
+            temperature
+            <input id="temperature" type="range" min="0" max="1" step="0.05" value="0.1" />
+          </label>
+
+          <div class="checkbox-row">
+            <input id="sources" type="checkbox" checked />
+            <label for="sources">소스 카드 표시</label>
+          </div>
+
+          <div class="checkbox-row">
+            <input id="debug" type="checkbox" />
+            <label for="debug">retrieval debug 표시</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">빠른 질문</h2>
+        <div class="quick-list">
+          <button class="quick-btn" data-query="SAS에서 라이브러리를 어떻게 할당하나요?">LIBNAME으로 라이브러리 할당</button>
+          <button class="quick-btn" data-query="상관 분석은 어떻게 해?">상관 분석과 PROC CORR</button>
+          <button class="quick-btn" data-query="data step에서 set statement는 어떻게 써?">DATA step의 SET statement</button>
+          <button class="quick-btn" data-query="매크로 변수는 어떻게 정의하나요?">매크로 변수 정의</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">상태</h2>
+        <p class="meta-copy" id="status-copy">대기 중입니다. 질문을 보내면 검색 단계와 답변 생성 단계를 분리해서 보여줍니다.</p>
+      </section>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="status-block">
+          <h2 class="status-title">Chat Workspace</h2>
+          <div class="status-row">
+            <span class="chip live" id="status-chip">Idle</span>
+            <span class="chip">Each prompt is answered independently</span>
+          </div>
+        </div>
+        <div class="timing-row" id="timing-row"></div>
+      </header>
+
+      <section class="chat-scroll" id="chat-scroll">
+        <div class="empty-state" id="empty-state">
+          <h2>질문을 던지면 문서를 찾고, 근거를 바탕으로 답합니다.</h2>
+          <p>이 화면은 multi-turn memory를 흉내 내지 않습니다. 각 질문은 독립적으로 검색하고, 필요한 소스와 검색 시간도 같이 보여줍니다.</p>
+        </div>
+        <div id="messages"></div>
+      </section>
+
+      <footer class="composer">
+        <div class="composer-card">
+          <textarea id="query" placeholder="예: PROC CORR는 어떻게 써?&#10;예: SAS에서 라이브러리를 어떻게 할당하나요?"></textarea>
+          <div class="composer-actions">
+            <span class="composer-hint">Enter로 전송, Shift+Enter로 줄바꿈</span>
+            <div style="display:flex; gap:10px;">
+              <button class="ghost-btn" id="clear">대화 비우기</button>
+              <button class="send-btn" id="send">질문 보내기</button>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const messagesEl = document.getElementById("messages");
+    const emptyStateEl = document.getElementById("empty-state");
+    const queryEl = document.getElementById("query");
+    const modeEl = document.getElementById("mode");
+    const topkEl = document.getElementById("topk");
+    const temperatureEl = document.getElementById("temperature");
+    const statusChipEl = document.getElementById("status-chip");
+    const statusCopyEl = document.getElementById("status-copy");
+    const timingRowEl = document.getElementById("timing-row");
+    const sendButtonEl = document.getElementById("send");
+    const sourcesToggleEl = document.getElementById("sources");
+    const debugToggleEl = document.getElementById("debug");
+    const chatScrollEl = document.getElementById("chat-scroll");
+
+    modeEl.value = "__DEFAULT_MODE__";
+
+    let pendingMessage = null;
+    let pendingInterval = null;
+    let isComposing = false;
+
+    function setStatus(text, detail, busy = false) {
+      statusChipEl.textContent = text;
+      statusChipEl.classList.toggle("live", busy);
+      statusCopyEl.textContent = detail;
+    }
+
+    function clearTimings() {
+      timingRowEl.innerHTML = "";
+    }
+
+    function renderTimings(timings) {
+      clearTimings();
+      Object.entries(timings || {}).forEach(([key, value]) => {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = key + ": " + value + "ms";
+        timingRowEl.appendChild(chip);
+      });
+    }
+
+    function scrollToBottom() {
+      chatScrollEl.scrollTop = chatScrollEl.scrollHeight;
+    }
+
+    function makeMessage(role, text, options = {}) {
+      emptyStateEl.style.display = "none";
+      const wrapper = document.createElement("article");
+      wrapper.className = "message " + role + (options.pending ? " pending" : "");
+
+      const header = document.createElement("div");
+      header.className = "message-header";
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar";
+      avatar.textContent = role === "user" ? "You" : "SAS";
+
+      const label = document.createElement("span");
+      label.textContent = role === "user" ? "User Prompt" : "Assistant";
+
+      header.appendChild(avatar);
+      header.appendChild(label);
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;
+
+      wrapper.appendChild(header);
+      wrapper.appendChild(bubble);
+      messagesEl.appendChild(wrapper);
+      scrollToBottom();
+      return { wrapper, bubble };
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function markdownToHtml(markdown) {
+      const fenced = [];
+      let html = escapeHtml(markdown || "");
+      html = html.replace(/```([\s\S]*?)```/g, (_, code) => {
+        const token = "__CODE_BLOCK_" + fenced.length + "__";
+        fenced.push("<pre><code>" + code.trim() + "</code></pre>");
+        return token;
+      });
+      html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      html = html.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+      html = html
+        .split(/\n{2,}/)
+        .map((chunk) => "<p>" + chunk.replace(/\n/g, "<br />") + "</p>")
+        .join("");
+      fenced.forEach((block, index) => {
+        html = html.replace("__CODE_BLOCK_" + index + "__", block);
+      });
+      return html;
+    }
+
+    function setAssistantContent(bubble, text) {
+      bubble.innerHTML = markdownToHtml(text);
+    }
+
+    function renderSources(container, sources) {
+      if (!Array.isArray(sources) || !sources.length || !sourcesToggleEl.checked) {
+        return;
+      }
+      const section = document.createElement("section");
+      section.className = "sources";
+      const seen = new Set();
+      sources.forEach((source) => {
+        const key = [
+          source.docset || "",
+          source.section_path_text || "",
+          source.page_start || "",
+          source.page_end || "",
+        ].join("::");
+        if (seen.has(key)) {
+          return;
+        }
+        seen.add(key);
+        const card = document.createElement("div");
+        card.className = "source-card";
+
+        const title = document.createElement(source.source_html ? "a" : "div");
+        if (source.source_html) {
+          title.href = source.source_html;
+          title.target = "_blank";
+          title.rel = "noreferrer";
+        }
+        title.textContent = source.section_path_text || source.docset || "Source";
+
+        const meta = document.createElement("div");
+        meta.className = "source-meta";
+
+        const docset = document.createElement("span");
+        docset.textContent = "docset: " + (source.docset || "-");
+        meta.appendChild(docset);
+
+        const pages = document.createElement("span");
+        const pageLabel = source.page_start ? (
+          source.page_end && source.page_end !== source.page_start
+            ? source.page_start + "-" + source.page_end
+            : String(source.page_start)
+        ) : "-";
+        pages.textContent = "pages: " + pageLabel;
+        meta.appendChild(pages);
+
+        card.appendChild(title);
+        card.appendChild(meta);
+        section.appendChild(card);
+      });
+      container.appendChild(section);
+    }
+
+    function renderDebug(container, payload) {
+      if (!debugToggleEl.checked) {
+        return;
+      }
+      const details = document.createElement("details");
+      details.className = "details";
+      const summary = document.createElement("summary");
+      summary.textContent = "retrieval debug";
+      const pre = document.createElement("pre");
+      pre.textContent = JSON.stringify(payload, null, 2);
+      details.appendChild(summary);
+      details.appendChild(pre);
+      container.appendChild(details);
+    }
+
+    function startPendingState() {
+      pendingMessage = makeMessage("assistant", "Searching documentation");
+      let tick = 0;
+      const phases = [
+        "Searching documentation",
+        "Collecting likely sections",
+        "Generating answer",
+      ];
+      pendingInterval = window.setInterval(() => {
+        if (!pendingMessage) {
+          return;
+        }
+        const phase = phases[Math.min(Math.floor(tick / 3), phases.length - 1)];
+        const dots = ".".repeat((tick % 3) + 1);
+        pendingMessage.bubble.textContent = phase + dots;
+        tick += 1;
+      }, 420);
+    }
+
+    function stopPendingState(answerText, responseData) {
+      if (pendingInterval) {
+        window.clearInterval(pendingInterval);
+        pendingInterval = null;
+      }
+      if (!pendingMessage) {
+        pendingMessage = makeMessage("assistant", "");
+      }
+      pendingMessage.wrapper.classList.remove("pending");
+      setAssistantContent(pendingMessage.bubble, answerText || "답변이 비어 있습니다.");
+      renderSources(pendingMessage.wrapper, responseData.sources || []);
+      renderDebug(pendingMessage.wrapper, responseData);
+      pendingMessage = null;
+      scrollToBottom();
+    }
+
+    async function sendQuery(prefilled) {
+      const query = (prefilled ?? queryEl.value).trim();
+      if (!query || sendButtonEl.disabled) {
+        return;
+      }
+
+      queryEl.value = "";
+      sendButtonEl.disabled = true;
+      setStatus("Working", "문서를 검색한 뒤 답변을 생성하고 있습니다.", true);
+      clearTimings();
+      makeMessage("user", query);
+      startPendingState();
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query,
+            mode: modeEl.value,
+            top_k: Number(topkEl.value || "__DEFAULT_TOPK__"),
+            temperature: Number(temperatureEl.value || 0.1),
+            show_sources: sourcesToggleEl.checked,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "request failed");
+        }
+
+        stopPendingState(data.answer, data);
+        renderTimings((data.retrieval || {}).timings_ms || {});
+        setStatus("Answered", "근거 문서 기반으로 답변을 만들었습니다.", false);
+      } catch (error) {
+        stopPendingState("요청 처리 중 오류가 발생했습니다.\n\n" + String(error), { sources: [] });
+        setStatus("Error", "요청에 실패했습니다. 설정과 서버 상태를 확인하세요.", false);
+      } finally {
+        sendButtonEl.disabled = false;
+        queryEl.focus();
+      }
+    }
+
+    document.getElementById("send").addEventListener("click", () => sendQuery());
+    document.getElementById("clear").addEventListener("click", () => {
+      messagesEl.innerHTML = "";
+      emptyStateEl.style.display = "";
+      clearTimings();
+      setStatus("Idle", "대기 중입니다. 질문을 보내면 검색 단계와 답변 생성 단계를 분리해서 보여줍니다.", false);
+    });
+
+    queryEl.addEventListener("compositionstart", () => {
+      isComposing = true;
+    });
+
+    queryEl.addEventListener("compositionend", () => {
+      isComposing = false;
+    });
+
+    queryEl.addEventListener("keydown", (event) => {
+      if (event.isComposing || isComposing) {
+        return;
+      }
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendQuery();
+      }
+    });
+
+    document.querySelectorAll(".quick-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        queryEl.value = button.dataset.query || "";
+        queryEl.focus();
+      });
+    });
+  </script>
+</body>
+</html>

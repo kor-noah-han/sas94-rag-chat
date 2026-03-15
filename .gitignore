@@ -1,0 +1,9 @@
+/data/raw/
+/data/processed/
+/data/qdrant/
+/casdocs/
+/.playwright-cli/
+/sas94-search-data-*/
+.env
+.DS_Store
+__pycache__/
