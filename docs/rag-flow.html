@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>RAG 프로세스 흐름도</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #f4f6f9;
+      font-family: 'Noto Sans KR', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #1a2640;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      letter-spacing: -0.02em;
+    }
+    .diagram-wrap {
+      background: #ffffff;
+      border: 1px solid #d0d8e8;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      max-width: 960px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>SAS 문서 기반 챗봇 — RAG 프로세스 흐름도</h1>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+graph TD
+    classDef llm fill:#dbeafe,stroke:#2563eb,stroke-width:2px;
+    classDef api fill:#ede9fe,stroke:#7c3aed,stroke-width:2px;
+    classDef process fill:#e1f5fe,stroke:#0284c7,stroke-width:1px;
+    classDef user fill:#f0fdf4,stroke:#16a34a,stroke-width:2px;
+    classDef feature fill:#fffde7,stroke:#ca8a04,stroke-width:1px,stroke-dasharray: 5 5;
+
+    subgraph Main_Flow [RAG 동작 방식]
+        direction TB
+
+        Input(질문 입력) --> Step1
+
+        Step1[① 쿼리 재작성<br/>LLM]:::llm
+        Step1 -.-> |한국어 질문 →<br/>SAS 최적화 영문 키워드| Step1
+
+        Step1 --> Step2
+
+        subgraph Search_Process [문서 검색 및 재시도]
+            Step2[② 문서 검색<br/>sas-94-search-api]:::api
+            Step2 -.-> |SQLite FTS5 전문 검색<br/>lexical 모드| Step2
+
+            Step2 --> Search_Check{검색 결과<br/>충분?}
+
+            Search_Check -- No --> Step1_Retry[쿼리 재작성<br/>및 재검색 fallback]:::feature
+            Step1_Retry --> Step2
+        end
+
+        Search_Check -- Yes --> Step3
+
+        Step3[③ 컨텍스트 조립]:::process
+        Step3 -.-> |검색된 청크 병합<br/>최대 14,000자| Step3
+
+        Step3 --> Step4
+
+        Step4[④ 답변 생성<br/>LLM]:::llm
+        Step4 -.-> |System: context 기반, 한국어로| Step4
+        Step4 -.-> |User: 원본 질문 + context| Step4
+
+        Step4 --> Output(한국어 답변 +<br/>인용 출처 docset p.xx)
+    end
+
+    subgraph Core_Features [핵심 특징]
+        Feature1(자동 재검색<br/>fallback)
+        Feature2(독립 처리<br/>대화 히스토리 없음)
+        Feature3(할루시네이션 제한<br/>System 프롬프트 제약)
+
+        Feature1 -.-> |검색 결과 부족 시| Search_Check
+        Feature2 -.-> |각 질문 독립성| Input
+        Feature3 -.-> |context 외 내용 제한| Step4
+    end
+
+    class Feature1,Feature2,Feature3 feature;
+    class Input,Output user;
+    </pre>
+  </div>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, securityLevel: 'loose', theme: 'default' });
+  </script>
+</body>
+</html>

@@ -6,8 +6,7 @@ SYSTEM_PROMPT = (
     "Answer only from the supplied context. "
     "If the context contains syntax, examples, or procedural steps, answer directly from them. "
     "Only say the context is insufficient when the context truly does not support an answer. "
-    "Use the same language as the user's question when practical. "
-    "Prefer Korean when the user asks in Korean. "
+    "Always answer in Korean unless the user explicitly asks in another language. "
     "Cite supporting evidence inline with short labels such as [lepg p.12-13]. "
     "When answering a how-to question, start with the direct method first, then add short details."
 )

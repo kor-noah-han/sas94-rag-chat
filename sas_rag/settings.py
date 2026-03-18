@@ -9,20 +9,20 @@ if TYPE_CHECKING:
 
 
 @dataclass(frozen=True)
-class GeminiSettings:
+class OpenAISettings:
+    base_url: str
     model: str
     api_key: str
-    base_url: str
 
 
-def load_gemini_settings(config: GenerationConfig) -> GeminiSettings:
-    model = config.model or os.environ.get("GEMINI_MODEL")
-    api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
-    base_url = os.environ.get("GEMINI_API_BASE_URL")
-    if not model:
-        raise RuntimeError("Missing GEMINI_MODEL.")
+def load_openai_settings(config: GenerationConfig) -> OpenAISettings:
+    base_url = os.environ.get("OPENAI_BASE_URL", "").rstrip("/")
+    model = config.model or os.environ.get("OPENAI_MODEL", "")
+    api_key = os.environ.get("OPENAI_API_KEY", "")
     if not base_url:
-        raise RuntimeError("Missing GEMINI_API_BASE_URL.")
+        raise RuntimeError("Missing OPENAI_BASE_URL.")
+    if not model:
+        raise RuntimeError("Missing OPENAI_MODEL.")
     if not api_key:
-        raise RuntimeError("Missing GEMINI_API_KEY or GOOGLE_API_KEY.")
-    return GeminiSettings(model=model, api_key=api_key, base_url=base_url)
+        raise RuntimeError("Missing OPENAI_API_KEY.")
+    return OpenAISettings(base_url=base_url, model=model, api_key=api_key)

@@ -190,7 +190,10 @@ def make_handler(server_args: argparse.Namespace):
                 self._send_json({"error": str(exc)}, status=400)
                 return
             except Exception as exc:
-                self._send_json({"error": str(exc)}, status=500)
+                if "LLM_TIMEOUT" in str(exc):
+                    self._send_json({"error": "timeout"}, status=504)
+                else:
+                    self._send_json({"error": str(exc)}, status=500)
                 return
 
             self._send_json(

@@ -7,3 +7,6 @@
 .env
 .DS_Store
 __pycache__/
+data/sas94-search-data-*/
+.venv/
+.claude/

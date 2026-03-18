@@ -4,7 +4,7 @@ import json
 import ssl
 import time
 from dataclasses import dataclass
-from urllib import error, parse, request
+from urllib import error, request
 
 try:
     import certifi
@@ -18,7 +18,7 @@ from sas_rag.prompts import (
     build_search_rewrite_prompt,
     build_user_prompt,
 )
-from sas_rag.settings import load_gemini_settings
+from sas_rag.settings import load_openai_settings
 
 
 LOGGER = get_logger(__name__)
@@ -31,48 +31,26 @@ class GenerationConfig:
     insecure: bool = False
 
 
-def extract_text_from_response(payload: dict[str, object]) -> str:
-    candidates = payload.get("candidates", [])
-    texts: list[str] = []
-    for candidate in candidates:
-        content = candidate.get("content", {})
-        for part in content.get("parts", []):
-            text = part.get("text")
-            if text:
-                texts.append(text)
-    return "\n".join(texts).strip()
+def _call_llm(system_prompt: str, user_prompt: str, config: GenerationConfig) -> str:
+    settings = load_openai_settings(config)
 
-
-def _call_gemini_text(system_prompt: str, user_prompt: str, config: GenerationConfig) -> str:
-    settings = load_gemini_settings(config)
-
-    endpoint = f"{settings.base_url.rstrip('/')}/v1beta/models/{settings.model}:generateContent"
-    request_url = f"{endpoint}?{parse.urlencode({'key': settings.api_key})}"
+    url = f"{settings.base_url}/chat/completions"
     body = {
-        "system_instruction": {
-            "parts": [
-                {
-                    "text": system_prompt
-                }
-            ]
-        },
-        "generationConfig": {"temperature": config.temperature},
-        "contents": [
-            {
-                "role": "user",
-                "parts": [
-                    {
-                        "text": user_prompt
-                    }
-                ],
-            }
+        "model": settings.model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ],
+        "temperature": config.temperature,
     }
 
     req = request.Request(
-        request_url,
+        url,
         data=json.dumps(body).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {settings.api_key}",
+        },
         method="POST",
     )
 
@@ -88,15 +66,23 @@ def _call_gemini_text(system_prompt: str, user_prompt: str, config: GenerationCo
             payload = json.loads(response.read().decode("utf-8"))
     except error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Gemini API error: HTTP {exc.code}: {detail}") from exc
+        raise RuntimeError(f"LLM API error: HTTP {exc.code}: {detail}") from exc
     except error.URLError as exc:
-        raise RuntimeError(f"Gemini API request failed: {exc}") from exc
+        import socket
+        if isinstance(exc.reason, socket.timeout) or "timed out" in str(exc).lower():
+            raise RuntimeError("LLM_TIMEOUT") from exc
+        raise RuntimeError(f"LLM API request failed: {exc}") from exc
 
-    text = extract_text_from_response(payload)
+    try:
+        text = payload["choices"][0]["message"]["content"].strip()
+    except (KeyError, IndexError) as exc:
+        raise RuntimeError(f"LLM returned unexpected response: {json.dumps(payload, ensure_ascii=False)}") from exc
+
     if not text:
-        raise RuntimeError(f"Gemini API returned no text: {json.dumps(payload, ensure_ascii=False)}")
+        raise RuntimeError(f"LLM returned empty content: {json.dumps(payload, ensure_ascii=False)}")
+
     LOGGER.info(
-        "gemini_call_complete model=%s temperature=%.2f prompt_chars=%s latency_ms=%.2f",
+        "llm_call_complete model=%s temperature=%.2f prompt_chars=%s latency_ms=%.2f",
         settings.model,
         config.temperature,
         len(user_prompt),
@@ -105,8 +91,8 @@ def _call_gemini_text(system_prompt: str, user_prompt: str, config: GenerationCo
     return text
 
 
-def call_gemini(query: str, context: str, config: GenerationConfig) -> str:
-    return _call_gemini_text(SYSTEM_PROMPT, build_user_prompt(query, context), config)
+def call_llm(query: str, context: str, config: GenerationConfig) -> str:
+    return _call_llm(SYSTEM_PROMPT, build_user_prompt(query, context), config)
 
 
 def rewrite_query_for_search(
@@ -117,7 +103,7 @@ def rewrite_query_for_search(
     top_sections: list[str] | None = None,
     family_hints: list[str] | None = None,
 ) -> str:
-    rewritten = _call_gemini_text(
+    rewritten = _call_llm(
         SEARCH_REWRITE_SYSTEM_PROMPT,
         build_search_rewrite_prompt(
             query,

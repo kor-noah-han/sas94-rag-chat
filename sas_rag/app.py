@@ -41,8 +41,8 @@ def add_retrieval_args(
         default=env_default("QDRANT_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL),
         help="Dense embedding model.",
     )
-    parser.add_argument("--corpus", default=DEFAULT_CORPUS_PATH, help="Fallback corpus JSONL path.")
-    parser.add_argument("--fts-db", default=DEFAULT_FTS_DB_PATH, help="SQLite FTS index path.")
+    parser.add_argument("--corpus", default=env_default("CORPUS_PATH", DEFAULT_CORPUS_PATH), help="Fallback corpus JSONL path.")
+    parser.add_argument("--fts-db", default=env_default("FTS_DB_PATH", DEFAULT_FTS_DB_PATH), help="SQLite FTS index path.")
     parser.add_argument("--top-k", type=int, default=top_k_default, help=top_k_help)
     parser.add_argument("--dense-limit", type=int, default=24, help="Candidate pool size for dense retrieval.")
     parser.add_argument("--lexical-limit", type=int, default=24, help="Candidate pool size for lexical retrieval.")

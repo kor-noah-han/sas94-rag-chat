@@ -7,7 +7,7 @@ import time
 from sas94_search_api.retrieval import RetrievalConfig, RetrievalResult
 
 from sas_rag.app import build_context, retrieval_response_dict
-from sas_rag.generation import GenerationConfig, call_gemini, rewrite_query_for_search
+from sas_rag.generation import GenerationConfig, call_llm, rewrite_query_for_search
 from sas_rag.logging_utils import get_logger
 from sas_rag.search_package import import_run_search
 
@@ -226,8 +226,8 @@ def run_chat(
         answer = no_context_answer(query)
         answer_mode = "no_context"
     else:
-        answer = call_gemini(query, context, generation_config)
-        answer_mode = "gemini"
+        answer = call_llm(query, context, generation_config)
+        answer_mode = "azure_openai"
     sources = [
         {
             "docset": item.get("docset"),
